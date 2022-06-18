@@ -17,11 +17,13 @@ async def on_ready():
 
     for key in channel:
         guild = client.guilds[0]
-        member = await client.fetch_user(key)
-        channelName = str(member).split('#')
+        user = await client.fetch_user(key)
+        channelName = str(user).split('#')
         channelName = channelName[0] + "'s Channel" 
         newChannel = await guild.create_voice_channel(channelName)
 
+        Member = Member(user)
+        await discord.Member.move_to(,channel=newChannel)
 
 client.run(TOKEN)
 
