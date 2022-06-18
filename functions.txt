@@ -1,0 +1,13 @@
+on_member_join(member)
+on_member_remove(memeber)
+
+channel.purge()
+client.change_presence()
+
+
+@client.event()
+@client.command() 
+@tasks.loop()
+@clear.error <--- Checkt ob es ein error bei module clear gibt - modul claer async def clear()
+@commands.has_permissions(mamage_messages=True)
+@commands.check(arg) <--- checkt ob  argument true ist
