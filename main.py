@@ -5,7 +5,7 @@ import os
 import requests
 import json
 
-TOKEN = ''
+TOKEN = 'OTg3Nzk4NzUyNTYxNTk0Mzc4.GCT1zv.-UntIIlRFqtaL9xi8NdYZqCSHCTYBdoz9cLtb4'
 client = commands.Bot(command_prefix='.')
 
 @client.command(pass_context=True)
