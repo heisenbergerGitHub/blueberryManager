@@ -39,8 +39,6 @@ async def on_voice_state_update(member, before, after):
             channelName = str(user).split('#')
 
             listCategory = settings.listen_channels[listChannel]
-            print(listCategory)
-            print(type(listCategory))
             listCategory = discord.utils.get(guild.categories, id=listCategory)
 
             newChannel = await guild.create_voice_channel(f"{channelName[0]}'s Channel ", category = listCategory, overwrites=None, reason=None)
@@ -59,9 +57,8 @@ async def on_voice_state_update(member, before, after):
 
 
 @client.command(pass_context=True)
-async def changeName(ctx, message):
+async def channelName(ctx, message):
     author = ctx.author
-
     for channelAuth in list(chList):
         channelAuthName = int(chList[channelAuth])
         channelAuthName = client.get_channel(channelAuthName)
@@ -94,6 +91,21 @@ async def botSetup(ctx):
 async def exit(ctx):
     await ctx.reply('[+] Shutting Down...')
     sys.exit()
+
+
+
+@client.command(pass_context=True)
+@commands.has_permissions(manage_channels=True)
+async def lock(ctx):
+    author = ctx.author
+    for channelAuth in list(chList):
+        channelAuthName = int(chList[channelAuth])
+        channelAuthName = client.get_channel(channelAuthName)
+    
+        if(str(author), author.voice.channel) == (channelAuth, channelAuthName):
+            overwrite = ctx.channel.overwrites_for(ctx.guild.default_role)
+            overwrite.send_messages = False
+            await author.channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
 
 
 
