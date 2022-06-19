@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from discord import FFmpegPCMAudio
 import os
 import requests
 import json
@@ -19,7 +18,7 @@ TOKEN = tFile.read()
 client = commands.Bot(command_prefix='.')
 chList = {}
 role = settings.setup['mainRole']
-
+channellist = settings.listen_channels
 
 
 @client.event
@@ -30,27 +29,33 @@ async def on_ready():
 
 @client.event
 async def on_voice_state_update(member, before, after): 
-  
-    channel = client.get_channel(988055091640684639)
-    channel = channel.voice_states
+    for listChannel in settings.listen_channels:
+        channel = client.get_channel(listChannel)
+        channel = channel.voice_states
 
-    for key in channel:
-        guild = client.guilds[0]
-        user = await client.fetch_user(key)
-        channelName = str(user).split('#') 
-        newChannel = await guild.create_voice_channel(f"{channelName[0]}'s Channel ")
-        member = await guild.fetch_member(key)
-        await member.move_to(newChannel)
-        chList[str(user)] = str(newChannel.id)
+        for key in channel:
+            guild = client.guilds[0]
+            user = await client.fetch_user(key)
+            channelName = str(user).split('#')
 
-    for channel in list(chList):
-        channelIte = chList[channel]
-        channelName = client.get_channel(int(channelIte))
+            listCategory = settings.listen_channels[listChannel]
+            print(listCategory)
+            print(type(listCategory))
+            listCategory = discord.utils.get(guild.categories, id=listCategory)
 
-        if channelName.voice_states == {}:
-            await channelName.delete()
-            del chList[channel]
-            
+            newChannel = await guild.create_voice_channel(f"{channelName[0]}'s Channel ", category = listCategory, overwrites=None, reason=None)
+            member = await guild.fetch_member(key)
+            await member.move_to(newChannel)
+            chList[str(user)] = str(newChannel.id)
+
+        for channel in list(chList):
+            channelIte = chList[channel]
+            channelName = client.get_channel(int(channelIte))
+
+            if channelName.voice_states == {}:
+                await channelName.delete()
+                del chList[channel]
+
 
 
 @client.command(pass_context=True)
@@ -67,18 +72,20 @@ async def changeName(ctx, message):
 
 
 
-@client.command(pass_context=True)
+@client.command()  
 @commands.has_role(role)
 async def botSetup(ctx):
     guild = client.guilds[0]
     for channel in settings.channels:
         probeCategory = discord.utils.get(guild.categories, name=settings.channels[channel])
         if probeCategory == None:
-            await guild.create_category(settings.channels[channel], overwrites=None, reason=None)
+            curCategory = await guild.create_category(settings.channels[channel], overwrites=None, reason=None)
         
         probeChannels = discord.utils.get(guild.channels, name=channel)
         if probeChannels == None:
-            await guild.create_text_channel(channel, category = settings.channels[channel], overwrites=None, reason=None)
+            await guild.create_text_channel(channel, category = curCategory, overwrites=None, reason=None)
+            print(curCategory)
+            print(type(curCategory))
 
 
 
