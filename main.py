@@ -21,6 +21,7 @@ role = settings.setup['mainRole']
 channellist = settings.listen_channels
 
 
+
 @client.event
 async def on_ready():
     print('Ready')
@@ -77,13 +78,12 @@ async def botSetup(ctx):
         probeCategory = discord.utils.get(guild.categories, name=settings.channels[channel])
         if probeCategory == None:
             curCategory = await guild.create_category(settings.channels[channel], overwrites=None, reason=None)
-        
+       # else:
+        #    curCategory = settings.channels[channel]
         probeChannels = discord.utils.get(guild.channels, name=channel)
         if probeChannels == None:
             await guild.create_text_channel(channel, category = curCategory, overwrites=None, reason=None)
-            print(curCategory)
-            print(type(curCategory))
-
+    ctx.reply('[+] Bot setup succseful')
 
 
 @client.command(pass_context=True)

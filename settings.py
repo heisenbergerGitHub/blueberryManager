@@ -1,11 +1,11 @@
 setup = {
-    'mainRole' : 'IMPERATOR', 
+    'mainRole' : 'Imperator', 
     'complete' : False,
 }
 
 channels = {
-        'user-announcements' : 'd',
-        'court-channel' : 'd',
+        'user-announcements' : '▬▬Community Hub▬▬',
+        'court-channel' : '▬▬Community Hub▬▬',
         'bot-commands' : '▬▬bot-commands▬▬'
         }
 
