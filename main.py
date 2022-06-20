@@ -78,8 +78,10 @@ async def botSetup(ctx):
         probeCategory = discord.utils.get(guild.categories, name=settings.channels[channel])
         if probeCategory == None:
             curCategory = await guild.create_category(settings.channels[channel], overwrites=None, reason=None)
-       # else:
-        #    curCategory = settings.channels[channel]
+        else:
+            curCategory = guild.get_channel(settings.channels[channel])
+            print("dipshit")
+
         probeChannels = discord.utils.get(guild.channels, name=channel)
         if probeChannels == None:
             await guild.create_text_channel(channel, category = curCategory, overwrites=None, reason=None)
