@@ -1,10 +1,12 @@
 import discord
+from discord import SelectMenu, SelectOption, Button, ButtonStyle
 from discord.ext import commands
+from discord_ui import View
+
 import os
 import requests
 import json
 import sys
-import configparser
 import settings
 
 
@@ -20,13 +22,31 @@ chList = {}
 role = settings.setup['mainRole']
 channellist = settings.listen_channels
 
-
+#Setup, on_ready-----------------------------------------------------------------------------------
 
 @client.event
 async def on_ready():
     print('Ready')
 
 
+
+@client.command()  
+@commands.has_role(role)
+async def botSetup(ctx):
+    guild = client.guilds[0]
+    for channel in settings.channels:
+        probeCategory = discord.utils.get(guild.categories, name=settings.channels[channel])
+        if probeCategory == None:
+            curCategory = await guild.create_category(settings.channels[channel], overwrites=None, reason=None)
+        else:
+            curCategory = guild.get_channel(settings.channels[channel])
+
+        probeChannels = discord.utils.get(guild.channels, name=channel)
+        if probeChannels == None:
+            await guild.create_text_channel(channel, category = curCategory, overwrites=None, reason=None)
+    ctx.reply('[+] Bot setup succseful')
+
+# Commands, Checks, Events------------------------------------------------------------------------------------
 
 @client.event
 async def on_voice_state_update(member, before, after): 
@@ -57,6 +77,7 @@ async def on_voice_state_update(member, before, after):
 
 
 
+
 @client.command(pass_context=True)
 async def channelName(ctx, message):
     author = ctx.author
@@ -68,24 +89,6 @@ async def channelName(ctx, message):
             await author.voice.channel.edit(name= message)
             await ctx.reply('[+] Channel name has been changed to: ' + message, mention_author=False)
 
-
-
-@client.command()  
-@commands.has_role(role)
-async def botSetup(ctx):
-    guild = client.guilds[0]
-    for channel in settings.channels:
-        probeCategory = discord.utils.get(guild.categories, name=settings.channels[channel])
-        if probeCategory == None:
-            curCategory = await guild.create_category(settings.channels[channel], overwrites=None, reason=None)
-        else:
-            curCategory = guild.get_channel(settings.channels[channel])
-            print("dipshit")
-
-        probeChannels = discord.utils.get(guild.channels, name=channel)
-        if probeChannels == None:
-            await guild.create_text_channel(channel, category = curCategory, overwrites=None, reason=None)
-    ctx.reply('[+] Bot setup succseful')
 
 
 @client.command(pass_context=True)
@@ -109,6 +112,35 @@ async def lock(ctx):
             overwrite.send_messages = False
             await author.channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
 
+#Buttons--------------------------------------------------------------------------------------------
 
+@client.command()
+async def buttonSetup(ctx):
+    msgButtonsTest = await ctx.send('This is a test text', components=[[
+        Button(label='Kanal bearbeiten', custom_id='editChannel'),
+        Button(label = 'Kanal schliessen', custom_id='lockChannel'),
+        Button(label = 'Kanal oeffnen', custom_id='unlockChannel'),
+        Button(label = 'Einladung erstellen', custom_id='createInvite'),
+        Button(label = 'User kicken', custom_id='kickUser'),
+        Button(label = 'User blocken', custom_id='blockUser'),
+        Button(label = 'User entblocken', custom_id='unblockUser')
+    #Button(label = 'Channel Besitzer')
+
+    ]])
+    def check_button(i: discord.Interaction, button):
+       return i.author == ctx.author and i.message == msg_with_buttons
+
+    interaction, button = await client.wait_for('button_click', check=check_button)
+
+    embed = discord.Embed(title='You pressed an Button',
+    description=f'You pressed a {button.custom_id} button.',
+    color=discord.Color.random())
+    await interaction.respond(embed=embed)
+    
+
+
+
+
+#Useless Shit--------------------------------------------------------------------------------
 
 client.run(TOKEN)
