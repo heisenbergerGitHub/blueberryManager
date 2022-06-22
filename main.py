@@ -1,7 +1,6 @@
 import discord
 from discord import SelectMenu, SelectOption, Button, ButtonStyle, InteractionType
 from discord.ext import commands
-#from discord_components import DiscordComponents
 
 import os
 import requests
