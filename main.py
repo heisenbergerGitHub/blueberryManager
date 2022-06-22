@@ -50,34 +50,39 @@ async def botSetup(ctx):
 
 @client.event
 async def on_voice_state_update(member, before, after): 
+    #Checking every listed channel in settings.listen_channels
     for listChannel in settings.listen_channels:
+        # defining channel
         channel = client.get_channel(listChannel)
         channel = channel.voice_states
-
+        # every key (user) will get a new channel in their ownership and name
         for key in channel:
+            #Getting users id and name
             guild = client.guilds[0]
             user = await client.fetch_user(key)
             channelName = str(user).split('#')
-
+               
+             # Getting the category of the soon to be created channel  
             listCategory = settings.listen_channels[listChannel]
             listCategory = discord.utils.get(guild.categories, id=listCategory)
 
+            # creating a new channel with users name and moving the user
             newChannel = await guild.create_voice_channel(f"{channelName[0]}'s Channel ", category = listCategory, overwrites=None, reason=None)
             member = await guild.fetch_member(key)
             await member.move_to(newChannel)
             chList[str(user)] = str(newChannel.id)
-
+               # checking if channel is empty
         for channel in list(chList):
             channelIte = chList[channel]
             channelName = client.get_channel(int(channelIte))
-
+            #deleting channel if its empty
             if channelName.voice_states == {}:
                 await channelName.delete()
                 del chList[channel]
 
 
 
-
+#channel Edit -> soon to be replaced with Buttons
 @client.command(pass_context=True)
 async def channelName(ctx, message):
     author = ctx.author
@@ -90,7 +95,7 @@ async def channelName(ctx, message):
             await ctx.reply('[+] Channel name has been changed to: ' + message, mention_author=False)
 
 
-
+# Bot Shutdown (Imperator)
 @client.command(pass_context=True)
 @commands.has_role(role)
 async def exit(ctx):
@@ -98,7 +103,7 @@ async def exit(ctx):
     sys.exit()
 
 
-
+#Lock command -> soon to be replaced with buttons
 @client.command(pass_context=True)
 @commands.has_permissions(manage_channels=True)
 async def lock(ctx):
@@ -113,7 +118,7 @@ async def lock(ctx):
             await author.channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
 
 #Buttons--------------------------------------------------------------------------------------------
-
+# Buttons, wont work yet
 @client.command()
 async def buttonSetup(ctx):
     msgButtonsTest = await ctx.send('This is a test text', components=[[
@@ -125,7 +130,7 @@ async def buttonSetup(ctx):
         Button(label = 'User blocken', custom_id='blockUser'),
         Button(label = 'User entblocken', custom_id='unblockUser')
     #Button(label = 'Channel Besitzer')
-
+    #Callback functions will be here
     ]])
     def check_button(i: discord.Interaction, button):
        return i.author == ctx.author and i.message == msg_with_buttons
@@ -137,7 +142,7 @@ async def buttonSetup(ctx):
     color=discord.Color.random())
     await interaction.respond(embed=embed)
     
-
+# not working callback
 
 
 
