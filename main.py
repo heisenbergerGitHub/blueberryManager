@@ -1,7 +1,6 @@
 import discord
 from discord import SelectMenu, SelectOption, Button, ButtonStyle
 from discord.ext import commands
-from discord import View
 
 import os
 import requests
@@ -17,7 +16,7 @@ intents.presences = False
 
 tFile = open('TOKEN.txt', 'r')
 TOKEN = tFile.read()
-client = commands.Bot(command_prefix='.')
+client = commands.Bot(command_prefix='.', intents=discord.Intents.default())
 chList = {}
 role = settings.setup['mainRole']
 channellist = settings.listen_channels
@@ -27,7 +26,7 @@ channellist = settings.listen_channels
 @client.event
 async def on_ready():
     print('Ready')
-
+    DiscordComponents(bot, change_discord_methods=True)
 
 
 @client.command()  
@@ -116,24 +115,7 @@ async def lock(ctx):
 
 @client.command()
 async def buttonSetup(ctx):
-    msg_with_buttons = await ctx.send('This is a test text', components=[[
-        Button(label='Kanal bearbeiten', custom_id='editChannel', style=ButtonStyle.red),
-        Button(label = 'Kanal schliessen', custom_id='lockChannel', style=ButtonStyle.red),
-        Button(label = 'Kanal oeffnen', custom_id='unlockChannel', style=ButtonStyle.red),
-        Button(label = 'Einladung erstellen', custom_id='createInvite', style=ButtonStyle.red),
-        Button(label = 'User kicken', custom_id='kickUser', style=ButtonStyle.red),
-        Button(label = 'User blocken', custom_id='blockUser', style=ButtonStyle.red),
-        Button(label = 'User entblocken', custom_id='unblockUser', style=ButtonStyle.red)
-        ]])
-    #def check_button(i: discord.Interaction, button):
-     #   return i.author == ctx.author and i.message == msg_with_buttons
-
-    interaction, button = await client.wait_for('button_click', check=check_button)
-
-    embed = discord.Embed(title='You pressed an Button',
-    description=f'You pressed a {button.custom_id} button.',
-    color=discord.Color.random())
-    await interaction.respond(embed=embed)
+    await ctx.send(type=InteractionType.ChannelMessageWithSource, content="Message Here", components=[Button(style=ButtonStyle.URL, label="Example Invite Button", url="https://google.com"), Button(style=ButtonStyle.blue, label="Default Button", custom_id="button")])
 
 #Useless Shit--------------------------------------------------------------------------------
 
