@@ -1,7 +1,7 @@
 import discord
 from discord import SelectMenu, SelectOption, Button, ButtonStyle
 from discord.ext import commands
-from discord_ui import View
+from discord import View
 
 import os
 import requests
@@ -116,19 +116,17 @@ async def lock(ctx):
 
 @client.command()
 async def buttonSetup(ctx):
-    msgButtonsTest = await ctx.send('This is a test text', components=[[
-        Button(label='Kanal bearbeiten', custom_id='editChannel'),
-        Button(label = 'Kanal schliessen', custom_id='lockChannel'),
-        Button(label = 'Kanal oeffnen', custom_id='unlockChannel'),
-        Button(label = 'Einladung erstellen', custom_id='createInvite'),
-        Button(label = 'User kicken', custom_id='kickUser'),
-        Button(label = 'User blocken', custom_id='blockUser'),
-        Button(label = 'User entblocken', custom_id='unblockUser')
-    #Button(label = 'Channel Besitzer')
-
-    ]])
-    def check_button(i: discord.Interaction, button):
-       return i.author == ctx.author and i.message == msg_with_buttons
+    msg_with_buttons = await ctx.send('This is a test text', components=[[
+        Button(label='Kanal bearbeiten', custom_id='editChannel', style=ButtonStyle.red),
+        Button(label = 'Kanal schliessen', custom_id='lockChannel', style=ButtonStyle.red),
+        Button(label = 'Kanal oeffnen', custom_id='unlockChannel', style=ButtonStyle.red),
+        Button(label = 'Einladung erstellen', custom_id='createInvite', style=ButtonStyle.red),
+        Button(label = 'User kicken', custom_id='kickUser', style=ButtonStyle.red),
+        Button(label = 'User blocken', custom_id='blockUser', style=ButtonStyle.red),
+        Button(label = 'User entblocken', custom_id='unblockUser', style=ButtonStyle.red)
+        ]])
+    #def check_button(i: discord.Interaction, button):
+     #   return i.author == ctx.author and i.message == msg_with_buttons
 
     interaction, button = await client.wait_for('button_click', check=check_button)
 
@@ -136,10 +134,6 @@ async def buttonSetup(ctx):
     description=f'You pressed a {button.custom_id} button.',
     color=discord.Color.random())
     await interaction.respond(embed=embed)
-    
-
-
-
 
 #Useless Shit--------------------------------------------------------------------------------
 
