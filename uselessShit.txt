@@ -1,15 +1,1 @@
-@client.command(pass_context=True)
-@commands.has_role(role)
-async def botSetup(ctx):
-    guild = client.guilds[0]
-    for channel in settings.channels:
-        probeCategory = nextcord.utils.get(guild.categories, name=settings.channels[channel])
-        if probeCategory == None:
-            curCategory = await guild.create_category(settings.channels[channel], reason=None)
-        else:
-            curCategory = guild.get_channel(settings.channels[channel])
-
-        probeChannels = nextcord.utils.get(guild.channels, name=channel)
-        if probeChannels == None:
-            await guild.create_text_channel(channel, category = curCategory, reason=None)
-    ctx.reply('[+] Bot setup succseful')
+How to quote text: Add the ‘greater than’ (>) sign followed by a space.
