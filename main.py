@@ -1,6 +1,6 @@
 import nextcord
 from nextcord import SelectMenu, SelectOption, Button, ButtonStyle
-from nextcord.ext import commands, Form
+from nextcord.ext import commands 
 from nextcord.ui import  View, Select
 
 
@@ -15,7 +15,10 @@ import settings
 tFile = open('TOKEN.txt', 'r')
 TOKEN = tFile.read()
 
-client = commands.Bot(command_prefix=".", intents= nextcord.Intents.all())
+intents = nextcord.Intents.all()
+intents.members = True
+client = commands.Bot(command_prefix=".", intents=intents)
+
 chList = {}
 role = settings.setup['mainRole']
 channellist = settings.listen_channels
@@ -28,26 +31,11 @@ async def on_ready():
     print(f'[+] blueberryManager connected as {client.user} to ')
     print('--------------------------------')
 
-@client.command(pass_context=True)
-@commands.has_role(role)
-async def botSetup(ctx):
-    guild = client.guilds[0]
-    for channel in settings.channels:
-        probeCategory = nextcord.utils.get(guild.categories, name=settings.channels[channel])
-        if probeCategory == None:
-            curCategory = await guild.create_category(settings.channels[channel], reason=None)
-        else:
-            curCategory = guild.get_channel(settings.channels[channel])
-
-        probeChannels = nextcord.utils.get(guild.channels, name=channel)
-        if probeChannels == None:
-            await guild.create_text_channel(channel, category = curCategory, reason=None)
-    ctx.reply('[+] Bot setup succseful')
-
 # Commands, Checks, Events------------------------------------------------------------------------------------
 
 @client.event
-async def on_voice_state_update(member, before, after): 
+async def on_voice_state_update(member, before, after):
+     
     for listChannel in settings.listen_channels:
         channel = client.get_channel(listChannel)
         channel = channel.voice_states
@@ -73,45 +61,88 @@ async def on_voice_state_update(member, before, after):
 
 
 
-class userDropdown(nextcord.ui.Select):
-    def __init__(self):
-        options=[
-                    
-            nextcord.SelectOption(label="Option 1",emoji="👌",description="This is option 1!"),
-            nextcord.SelectOption(label="Option 2",emoji="✨",description="This is option 2!"),
-            nextcord.SelectOption(label="Option 3",emoji="🎭",description="This is option 3!")
-            ]
-        super().__init__(placeholder="Select an option",max_values=1,min_values=1,options=options)
 
-class DropdownView(nextcord.ui.View):
+#Editing Channel---------------------------------------------------------------------------------------
+
+
+class channelEdit(nextcord.ui.Modal):
     def __init__(self):
+        super().__init__(
+            "Kanaleinstellungen",
+            timeout=60,
+        )
+
+        self.name = nextcord.ui.TextInput(
+            label='Neuer Kanalname',
+        )
+        self.add_item(self.name)
+
+        self.size = nextcord.ui.TextInput(
+            label='Neue Kanalgroesse',
+        )
+        self.add_item(self.size)
+
+    async def callback(self, interaction: nextcord.Interaction) -> None:
+        author = interaction.user
+        for channelAuth in list(chList):
+            channelAuthName = int(chList[channelAuth])
+            channelAuthName = client.get_channel(channelAuthName)    
+            if(str(author), author.voice.channel) == (channelAuth, channelAuthName):
+                await author.voice.channel.edit(name= self.name.value, user_limit= self.size.value)
+                await interaction.response.send_message(f'[+] Kanalname wurde zu {self.name.value} geaendert\n[+] Kanalgroesse wurde auf {self.size.value} User limitiert')
+            else:
+                await interaction.response.send_message('[+] Du musst besitzer dieses Kanals sein um diesen editieren zu koennen')
+
+
+#Kick the user-----------------------------------------------------------------------------------------
+class userKickDropdown(nextcord.ui.Select):
+    def __init__(self, interaction : nextcord.Interaction):
+        channel = interaction.voice.channel
+        userDropdownList = []
+        for user in channel.voice_states:
+            listMember= client.get_user(user)
+            userDropdownList.append(nextcord.SelectOption(label= str(listMember),emoji="👾"))
+        super().__init__(placeholder="Userliste",max_values=1,min_values=1,options=userDropdownList)
+        
+    async def callback(self, interaction: nextcord.Interaction):
+        guild = client.guilds[0]  
+        await interaction.response.send_message(f'[+] User {self.values[0]} wurde erfolgreich gekickt')
+        memberToKick = str(self.values[0])
+        memberToKick =  guild.get_member_named(str(memberToKick))
+        await memberToKick.move_to(None)
+
+class kickDropdownView(nextcord.ui.View):
+    def __init__(self, user):
         super().__init__()
-        self.add_item(userDropdown())
+        self.add_item(userKickDropdown(user))
 
 
 
-
+#Buttonsstuf------------------------------------------------------------------------------------------
 class mButtons(nextcord.ui.View):
     def __init__(self, *, timeout=180):
         super().__init__(timeout=timeout)
 
-    @nextcord.ui.button(label='Kanal Edit')
+    @nextcord.ui.button(label='Kanal Edit', emoji = '⚙️')
     async def editCallback(self, button : nextcord.ui.Button, interaction):
-         
-        view = DropdownView()
-        await interaction.response.send_message("select dis", view=view)
+        modal = channelEdit()
+        await interaction.response.send_modal(modal)
+    
+    @nextcord.ui.button(label='Kanal oeffnen')
+    async def openCallback(self, button : nextcord.ui.Button, interaction):
+        pass
 
-
-
+    @nextcord.ui.button(label='Kanal schliessen')
+    async def closeCallback(self, button : nextcord.ui.Button, interaction):
+        pass    
 
     @nextcord.ui.button(label='User kicken')
     async def kickCallback(self, button, interaction):
-        view = DropdownView()
+        view = kickDropdownView(interaction.user)
         await interaction.response.send_message("User asuwaehlen:", view=view)
 
-
 @client.command()
-async def olla(ctx):
+async def c(ctx):
     view = mButtons()
     await ctx.send("", view=mButtons())
 
