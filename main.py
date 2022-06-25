@@ -1,7 +1,9 @@
 import nextcord
 from nextcord import SelectMenu, SelectOption, Button, ButtonStyle
-from nextcord.ext import commands
+from nextcord.ext import commands, Form
 from nextcord.ui import  View, Select
+
+
 
 import os
 import requests
@@ -67,31 +69,45 @@ async def on_voice_state_update(member, before, after):
             if channelName.voice_states == {}:
                 await channelName.delete()
                 del chList[channel]
-          
 
 
-#Buttons--------------------------------------------------------------------------------------------
+
+
+class userDropdown(nextcord.ui.Select):
+    def __init__(self):
+        options=[
+                    
+            nextcord.SelectOption(label="Option 1",emoji="👌",description="This is option 1!"),
+            nextcord.SelectOption(label="Option 2",emoji="✨",description="This is option 2!"),
+            nextcord.SelectOption(label="Option 3",emoji="🎭",description="This is option 3!")
+            ]
+        super().__init__(placeholder="Select an option",max_values=1,min_values=1,options=options)
+
+class DropdownView(nextcord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(userDropdown())
+
+
+
+
 class mButtons(nextcord.ui.View):
     def __init__(self, *, timeout=180):
         super().__init__(timeout=timeout)
 
     @nextcord.ui.button(label='Kanal Edit')
     async def editCallback(self, button : nextcord.ui.Button, interaction):
-        author = interaction.user
-        for channelAuth in list(chList):
-            channelAuthName = int(chList[channelAuth])
-            channelAuthName = client.get_channel(channelAuthName)    
-            if(str(author), author.voice.channel) == (channelAuth, channelAuthName):
-                await author.voice.channel.edit(name= message)
-                await ctx.reply('[+] Channel name has been changed to: ' + message, mention_author=False)
-        await interaction.response.send_message("select dis", view=self)
+         
+        view = DropdownView()
+        await interaction.response.send_message("select dis", view=view)
+
 
 
 
     @nextcord.ui.button(label='User kicken')
     async def kickCallback(self, button, interaction):
-        pass
-
+        view = DropdownView()
+        await interaction.response.send_message("User asuwaehlen:", view=view)
 
 
 @client.command()
