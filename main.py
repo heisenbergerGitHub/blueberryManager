@@ -148,7 +148,7 @@ class mButtons(nextcord.ui.View):
     async def kickCallback(self, button, interaction):
         try:
             view = kickDropdownView(interaction.user)
-            await interaction.response.send_message("User asuwaehlen:", view=view)
+            await interaction.response.send_message("User asuwaehlen:", view=view, ephemeral=True)
         except AttributeError:
             await interaction.response.send_message("[+] Du bist in keinem Channel", ephemeral=True)
 @client.command()
