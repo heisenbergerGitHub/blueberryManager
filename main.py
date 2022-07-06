@@ -3,10 +3,6 @@ from nextcord import SelectMenu, SelectOption, Button, ButtonStyle
 from nextcord.ext import commands 
 from nextcord.ui import  View, Select
 
-import os
-import requests
-import json
-import sys
 import settings
 
 
