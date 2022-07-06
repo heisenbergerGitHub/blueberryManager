@@ -151,7 +151,9 @@ class mButtons(nextcord.ui.View):
             await interaction.response.send_message("User asuwaehlen:", view=view, ephemeral=True)
         except AttributeError:
             await interaction.response.send_message("[+] Du bist in keinem Channel", ephemeral=True)
+
 @client.command()
+@commands.has_role(role)
 async def c(ctx):
     view = mButtons()
     embed = nextcord.Embed(title="Kanalverwaltung", color= nextcord.Colour.gold(), description='Um einen Kanal zu erstellen, gehe einfach zu deiner gewuenschten Kategorie und auf **Kanal erstellen**. Dann kannst du hier deinen Kanal bearbeiten und User verwalten')
