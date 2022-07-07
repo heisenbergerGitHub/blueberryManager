@@ -122,7 +122,7 @@ class kickDropdownView(nextcord.ui.View):
 
 #Buttonsstuf------------------------------------------------------------------------------------------
 class mButtons(nextcord.ui.View):
-    def __init__(self, *, timeout=180):
+    def __init__(self, *, timeout = None):
         super().__init__(timeout=timeout)
 
     @nextcord.ui.button(label='Kanal Edit', emoji = '⚙️')
