@@ -23,6 +23,8 @@ channellist = settings.listen_channels
 #Setup, on_ready-----------------------------------------------------------------------------------
 @client.event
 async def on_ready():
+    global guild
+    guild = client.guilds[0]
     print('--------------------------------')
     print(f'[+] blueberryManager connected as {client.user} to ')
     print('--------------------------------')
@@ -37,13 +39,14 @@ async def on_voice_state_update(member, before, after):
         channel = client.get_channel(listChannel)
         channel = channel.voice_states
         for key in channel:
-            guild = client.guilds[0]
+
             user = await client.fetch_user(key)
             channelName = str(user).split('#')
             listCategory = settings.listen_channels[listChannel]
             listCategory = nextcord.utils.get(guild.categories, id=listCategory)
             newChannel = await guild.create_voice_channel(f"{channelName[0]}'s Channel ", category = listCategory, reason=None)
             member = await guild.fetch_member(key)
+
             await member.move_to(newChannel)
             chList[str(user)] = str(newChannel.id)
         
@@ -102,7 +105,6 @@ class userKickDropdown(nextcord.ui.Select):
     async def callback(self, interaction: nextcord.Interaction):
         author = interaction.user
         for channelAuth in list(chList):
-            guild = client.guilds[0]
             channelAuthName = int(chList[channelAuth])
             channelAuthName = client.get_channel(channelAuthName)    
             if(str(author), author.voice.channel) == (channelAuth, channelAuthName):
@@ -132,11 +134,11 @@ class mButtons(nextcord.ui.View):
             await interaction.response.send_modal(modal)
         except AttributeError:
             await interaction.response.send_message("[+] Du bist in keinem Channel", ephemeral=True)
-    @nextcord.ui.button(label='Kanal oeffnen')
+    @nextcord.ui.button(label='Kanal öffnen', emoji = '🔓')
     async def openCallback(self, button : nextcord.ui.Button, interaction):
         pass
 
-    @nextcord.ui.button(label='Kanal schliessen')
+    @nextcord.ui.button(label='Kanal schliessen', emoji = '🔒')
     async def closeCallback(self, button : nextcord.ui.Button, interaction):
         pass    
 
